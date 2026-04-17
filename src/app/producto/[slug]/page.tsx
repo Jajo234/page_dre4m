@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { getProductBySlug } from '@/lib/queries';
 import { ProductDetail } from '@/components/ProductDetail';
 
+export const runtime = 'edge';
 export const revalidate = 60;
 
 export default async function ProductPage({

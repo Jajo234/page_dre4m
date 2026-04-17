@@ -4,6 +4,7 @@ import { ProductGrid } from '@/components/ProductGrid';
 import { CategoryFilter } from '@/components/CategoryFilter';
 
 // Revalida cada 60s para que los cambios en Sanity aparezcan pronto
+export const runtime = 'edge';
 export const revalidate = 60;
 
 export default async function HomePage() {
