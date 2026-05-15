@@ -29,10 +29,10 @@ export function Header() {
         {/* Logo */}
         <Link href="/" className="shrink-0 group">
           <div className="heading-display text-3xl sm:text-4xl leading-none">
-            RETRO<span className="text-accent">·</span>FÚTBOL
+            DRE4M<span className="text-accent">·</span>
           </div>
           <div className="text-[10px] font-mono tracking-[0.3em] text-ink/60 mt-0.5">
-            EST · CAMISETAS · CO
+            FUTBOL · CAMISETAS · COLOMBIA
           </div>
         </Link>
 
