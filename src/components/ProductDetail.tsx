@@ -152,7 +152,6 @@ export function ProductDetail({ product }: { product: Product }) {
           {/* Info extra */}
           <div className="mt-8 pt-8 border-t border-ink/10 space-y-2 text-sm text-ink/70">
             <p>✓ Envíos a toda Colombia</p>
-            <p>✓ Pago contra entrega disponible</p>
             <p>✓ Atención directa por WhatsApp</p>
           </div>
         </div>

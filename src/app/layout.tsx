@@ -5,11 +5,11 @@ import { CartDrawer } from '@/components/CartDrawer';
 import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'Retro Fútbol Shop — Camisetas retro, jugador y fan',
+  title: 'DRE4M',
   description:
     'Tienda de camisetas de fútbol retro, versión jugador y versión fan. Envíos a todo Colombia.',
   openGraph: {
-    title: 'Retro Fútbol Shop',
+    title: 'DRE4M',
     description: 'Camisetas retro, jugador y fan.',
     type: 'website',
   },

@@ -1,30 +1,70 @@
+import { FaWhatsapp, FaInstagram, FaFacebook } from "react-icons/fa";
+
+const WHATSAPP_NUMBER =
+  process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "573158801259";
+
+const WHATSAPP_MESSAGE = encodeURIComponent(
+  "¡Hola! Vi su tienda DRE4M y me gustaría recibir información sobre las camisetas.",
+);
+
 export function Footer() {
   return (
     <footer className="relative z-10 border-t-2 border-ink bg-ink text-cream mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid md:grid-cols-3 gap-8">
+        {/* BRAND */}
         <div>
           <div className="heading-display text-3xl">
-            RETRO<span className="text-accent">·</span>FÚTBOL
+            DRE4M<span className="text-accent">·</span>
           </div>
           <p className="text-cream/70 text-sm mt-3 leading-relaxed max-w-xs">
-            Camisetas retro, versión jugador y versión fan. Para los que viven el fútbol.
+            Camisetas retro, versión jugador y versión fan. Para los que viven
+            el fútbol.
           </p>
         </div>
 
+        {/* CONTACTO */}
         <div>
           <h3 className="font-mono text-xs tracking-[0.3em] text-cream/50 mb-3">
             CONTACTO
           </h3>
-          <ul className="space-y-2 text-sm">
-            <li>WhatsApp directo</li>
-            <li>Envíos a todo Colombia</li>
-            <li>Pagos contra entrega disponibles</li>
+          <ul className="space-y-3 text-sm">
+            <li>
+              <a
+                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 hover:text-accent transition"
+              >
+                <FaWhatsapp /> WhatsApp
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="https://www.instagram.com/dre4m_col?igsh=YjZ3YnFhdHNidWE0"
+                target="_blank"
+                className="flex items-center gap-2 hover:text-accent transition"
+              >
+                <FaInstagram /> Instagram
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="https://www.facebook.com/share/1UN6sZDH69/?mibextid=wwXIfr"
+                target="_blank"
+                className="flex items-center gap-2 hover:text-accent transition"
+              >
+                <FaFacebook /> Facebook
+              </a>
+            </li>
           </ul>
         </div>
 
+        {/* TIPOS */}
         <div>
           <h3 className="font-mono text-xs tracking-[0.3em] text-cream/50 mb-3">
-            CATEGORÍAS
+            TIPOS
           </h3>
           <ul className="space-y-2 text-sm">
             <li>Retro</li>
