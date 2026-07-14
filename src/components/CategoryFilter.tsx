@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface Props {
   categories: { name: string; slug: string }[];
@@ -9,18 +9,25 @@ interface Props {
 export function CategoryFilter({ categories }: Props) {
   const router = useRouter();
   const params = useSearchParams();
-  const activeCategory = params.get('cat');
-  const activeType = params.get('type');
+  const activeCategory = params.get("cat");
+  const activeType = params.get("type");
 
   const setParam = (key: string, value: string | null) => {
-    const newParams = new URLSearchParams(params.toString());
-    if (value === null || newParams.get(key) === value) {
+    const newParams = new URLSearchParams(window.location.search);
+
+    if (value === null) {
       newParams.delete(key);
     } else {
       newParams.set(key, value);
     }
-    const qs = newParams.toString();
-    router.push(qs ? `/?${qs}` : '/');
+
+    const url = `${window.location.pathname}${
+      newParams.toString() ? `?${newParams.toString()}` : ""
+    }`;
+
+    console.log("URL FINAL:", url);
+
+    router.push(url);
   };
 
   const pill = (active: boolean) =>
