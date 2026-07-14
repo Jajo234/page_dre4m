@@ -6,10 +6,6 @@ import { formatPrice } from '@/lib/utils';
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '573158801259';
 const STORE_NAME = process.env.NEXT_PUBLIC_STORE_NAME || 'Retro Futbol Shop';
 
-/**
- * Construye un mensaje legible para WhatsApp a partir del carrito.
- * Usa texto plano + emojis (WhatsApp no soporta Markdown completo).
- */
 function buildWhatsAppMessage(
   items: ReturnType<typeof useCart.getState>['items'],
   total: number
