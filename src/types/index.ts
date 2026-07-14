@@ -1,6 +1,6 @@
-export type JerseyType = 'retro' | 'jugador' | 'fan';
+export type JerseyType = "retro" | "jugador" | "fan";
 
-export type Size = 'S' | 'M' | 'L' | 'XL' | 'XXL';
+export type Size = "S" | "M" | "L" | "XL" | "XXL";
 
 export interface Product {
   _id: string;
@@ -33,4 +33,10 @@ export interface CartItem {
   price: number;
   quantity: number;
   image: string;
+
+  customization?: {
+    enabled: boolean;
+    playerName?: string;
+    number?: string;
+  };
 }

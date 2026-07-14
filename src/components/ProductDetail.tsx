@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, Check } from 'lucide-react';
-import type { Product, Size } from '@/types';
-import { useCart } from '@/store/cart';
-import { formatPrice } from '@/lib/utils';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Check } from "lucide-react";
+import type { Product, Size } from "@/types";
+import { useCart } from "@/store/cart";
+import { formatPrice } from "@/lib/utils";
 
 export function ProductDetail({ product }: { product: Product }) {
   const router = useRouter();
@@ -16,16 +16,65 @@ export function ProductDetail({ product }: { product: Product }) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [justAdded, setJustAdded] = useState(false);
 
+  const [customize, setCustomize] = useState(false);
+  const [playerName, setPlayerName] = useState("");
+  const [number, setNumber] = useState("");
+  const CUSTOMIZATION_PRICE = 10000;
+
   const typeLabel =
-    product.type === 'retro' ? 'Retro' :
-    product.type === 'jugador' ? 'Versión Jugador' : 'Versión Fan';
+    product.type === "retro"
+      ? "Retro"
+      : product.type === "jugador"
+        ? "Versión Jugador"
+        : "Versión Fan";
+
+  const finalPrice = product.price + (customize ? CUSTOMIZATION_PRICE : 0);
 
   const handleAdd = () => {
     if (!selectedSize || !product.stock) return;
-    addItem(product, selectedSize, 1);
+
+    const cleanName = playerName.trim().toUpperCase();
+    const cleanNumber = number.trim();
+
+    if (customize) {
+      if (!cleanName || !cleanNumber) {
+        alert("Completa el nombre y el dorsal.");
+        return;
+      }
+
+      const dorsal = Number(cleanNumber);
+
+      if (Number.isNaN(dorsal) || dorsal < 0 || dorsal > 99) {
+        alert("El dorsal debe estar entre 0 y 99.");
+        return;
+      }
+    }
+
+    addItem(
+      product,
+      selectedSize,
+      1,
+      customize
+        ? {
+            enabled: true,
+            playerName: cleanName,
+            number: cleanNumber,
+          }
+        : undefined,
+    );
+
     setJustAdded(true);
-    setTimeout(() => setJustAdded(false), 1500);
-    // Abre el carrito para que vea lo que agregó
+
+    setTimeout(() => {
+      setJustAdded(false);
+    }, 1500);
+
+    // Limpiar formulario
+    setCustomize(false);
+    setPlayerName("");
+    setNumber("");
+    setSelectedSize(null);
+
     setTimeout(() => openCart(), 300);
   };
 
@@ -60,11 +109,17 @@ export function ProductDetail({ product }: { product: Product }) {
                   key={idx}
                   onClick={() => setSelectedImage(idx)}
                   className={`aspect-square border-2 overflow-hidden transition-colors ${
-                    selectedImage === idx ? 'border-accent' : 'border-ink/20 hover:border-ink'
+                    selectedImage === idx
+                      ? "border-accent"
+                      : "border-ink/20 hover:border-ink"
                   }`}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={img} alt="" className="w-full h-full object-cover" />
+                  <img
+                    src={img}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
                 </button>
               ))}
             </div>
@@ -81,12 +136,18 @@ export function ProductDetail({ product }: { product: Product }) {
             {product.name}
           </h1>
 
-          <div className="text-ink/60 mb-6">
-            {product.team}
-          </div>
+          <div className="text-ink/60 mb-6">{product.team}</div>
 
-          <div className="heading-display text-5xl mb-8">
-            {formatPrice(product.price)}
+          <div className="mb-8">
+            <div className="heading-display text-5xl">
+              {formatPrice(finalPrice)}
+            </div>
+
+            {customize && (
+              <p className="mt-2 text-sm text-grass font-medium">
+                Incluye personalización (+{formatPrice(CUSTOMIZATION_PRICE)})
+              </p>
+            )}
           </div>
 
           {product.description && (
@@ -101,7 +162,7 @@ export function ProductDetail({ product }: { product: Product }) {
               SELECCIONA TU TALLA
             </div>
             <div className="flex flex-wrap gap-2">
-              {(['S', 'M', 'L', 'XL', 'XXL'] as Size[]).map((size) => {
+              {(["S", "M", "L", "XL", "XXL"] as Size[]).map((size) => {
                 const available = product.sizes.includes(size);
                 const selected = selectedSize === size;
                 return (
@@ -111,10 +172,10 @@ export function ProductDetail({ product }: { product: Product }) {
                     onClick={() => setSelectedSize(size)}
                     className={`w-14 h-14 border-2 font-mono font-semibold transition-colors ${
                       !available
-                        ? 'border-ink/10 text-ink/20 line-through cursor-not-allowed'
+                        ? "border-ink/10 text-ink/20 line-through cursor-not-allowed"
                         : selected
-                        ? 'border-ink bg-ink text-cream'
-                        : 'border-ink/30 hover:border-ink'
+                          ? "border-ink bg-ink text-cream"
+                          : "border-ink/30 hover:border-ink"
                     }`}
                   >
                     {size}
@@ -124,16 +185,95 @@ export function ProductDetail({ product }: { product: Product }) {
             </div>
           </div>
 
+          {/* Personalización */}
+          <div className="mb-8">
+            <div className="font-mono text-xs tracking-[0.3em] text-ink/60 mb-3">
+              PERSONALIZACIÓN
+            </div>
+
+            <label className="flex items-center gap-3 cursor-pointer mb-4">
+              <input
+                type="checkbox"
+                checked={customize}
+                onChange={(e) => {
+                  const checked = e.target.checked;
+
+                  setCustomize(checked);
+
+                  if (!checked) {
+                    setPlayerName("");
+                    setNumber("");
+                  }
+                }}
+              />
+              <span className="text-sm">Quiero personalizar mi camiseta</span>
+            </label>
+
+            {customize && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-mono tracking-[0.2em] mb-2">
+                    NOMBRE
+                  </label>
+
+                  <input
+                    type="text"
+                    value={playerName}
+                    onChange={(e) => {
+                      const value = e.target.value
+                        .toUpperCase()
+                        .replace(/[^A-ZÁÉÍÓÚÑ0-9 ]/g, "");
+
+                      setPlayerName(value);
+                    }}
+                    maxLength={15}
+                    placeholder="Ej. MESSI"
+                    className="w-full border-2 border-ink px-4 py-3 bg-transparent focus:outline-none focus:border-accent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-mono tracking-[0.2em] mb-2">
+                    DORSAL
+                  </label>
+
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={2}
+                    value={number}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, "");
+
+                      if (value === "") {
+                        setNumber("");
+                        return;
+                      }
+
+                      const n = Number(value);
+
+                      if (n >= 0 && n <= 99) {
+                        setNumber(value);
+                      }
+                    }}
+                    placeholder="10"
+                    className="w-28 border-2 border-ink px-4 py-3 bg-transparent focus:outline-none focus:border-accent"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Botón agregar */}
           <button
             onClick={handleAdd}
             disabled={!selectedSize || !product.stock}
             className={`w-full py-5 font-mono tracking-[0.2em] text-sm font-semibold transition-colors border-2 ${
               justAdded
-                ? 'bg-grass border-grass text-cream'
+                ? "bg-grass border-grass text-cream"
                 : !selectedSize || !product.stock
-                ? 'bg-ink/10 border-ink/10 text-ink/30 cursor-not-allowed'
-                : 'bg-ink border-ink text-cream hover:bg-accent hover:border-accent'
+                  ? "bg-ink/10 border-ink/10 text-ink/30 cursor-not-allowed"
+                  : "bg-ink border-ink text-cream hover:bg-accent hover:border-accent"
             }`}
           >
             {justAdded ? (
@@ -141,11 +281,11 @@ export function ProductDetail({ product }: { product: Product }) {
                 <Check className="w-4 h-4" /> AGREGADO AL CARRITO
               </span>
             ) : !product.stock ? (
-              'AGOTADO'
+              "AGOTADO"
             ) : !selectedSize ? (
-              'ELIGE UNA TALLA'
+              "ELIGE UNA TALLA"
             ) : (
-              'AGREGAR AL CARRITO'
+              "AGREGAR AL CARRITO"
             )}
           </button>
 
