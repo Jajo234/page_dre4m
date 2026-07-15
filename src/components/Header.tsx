@@ -1,21 +1,39 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { Search, ShoppingBag } from 'lucide-react';
-import { useCart } from '@/store/cart';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from "next/link";
+import { Search, ShoppingBag } from "lucide-react";
+import { useCart } from "@/store/cart";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export function Header() {
   const totalItems = useCart((s) => s.totalItems());
   const openCart = useCart((s) => s.openCart);
+
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const router = useRouter();
-  const [query, setQuery] = useState('');
+
+  const [query, setQuery] = useState("");
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+
     const q = query.trim();
-    if (q) router.push(`/?q=${encodeURIComponent(q)}`);
+
+    if (!q) {
+      router.push("/");
+      return;
+    }
+
+    router.push(`/?q=${encodeURIComponent(q)}`);
+
+    // Limpia el input
+    setQuery("");
   };
 
   return (
@@ -27,7 +45,7 @@ export function Header() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between gap-4">
         {/* Logo */}
-        <Link href="/" className="shrink-0 group">
+        <Link href="/" onClick={() => setQuery("")} className="shrink-0 group">
           <div className="heading-display text-3xl sm:text-4xl leading-none">
             DRE4M<span className="text-accent">·</span>
           </div>
@@ -45,9 +63,10 @@ export function Header() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar equipo, jugador, temporada..."
+            placeholder="Buscar equipo"
             className="w-full bg-transparent border-2 border-ink px-4 py-2.5 pr-11 text-sm focus:outline-none focus:border-accent transition-colors placeholder:text-ink/40"
           />
+
           <button
             type="submit"
             aria-label="Buscar"
@@ -64,10 +83,12 @@ export function Header() {
           className="relative shrink-0 border-2 border-ink bg-cream hover:bg-ink hover:text-cream transition-colors px-4 py-2.5 flex items-center gap-2 group"
         >
           <ShoppingBag className="w-5 h-5" />
+
           <span className="font-mono text-sm tracking-wider hidden sm:inline">
             CARRITO
           </span>
-          {totalItems > 0 && (
+
+          {mounted && totalItems > 0 && (
             <span className="absolute -top-2 -right-2 bg-accent text-cream text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full ring-2 ring-cream">
               {totalItems}
             </span>

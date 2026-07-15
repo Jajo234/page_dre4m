@@ -1,11 +1,20 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import type { CartItem, Product, Size } from '@/types';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import type { CartItem, Product, Size } from "@/types";
 
 interface CartState {
   items: CartItem[];
   isOpen: boolean;
-  addItem: (product: Product, size: Size, quantity?: number) => void;
+  addItem: (
+    product: Product,
+    size: Size,
+    quantity?: number,
+    customization?: {
+      enabled: boolean;
+      playerName?: string;
+      number?: string;
+    },
+  ) => void;
   removeItem: (productId: string, size: Size) => void;
   updateQuantity: (productId: string, size: Size, quantity: number) => void;
   clear: () => void;
@@ -22,18 +31,26 @@ export const useCart = create<CartState>()(
       items: [],
       isOpen: false,
 
-      addItem: (product, size, quantity = 1) => {
+      addItem: (product, size, quantity = 1, customization) => {
         const items = get().items;
         const existing = items.find(
-          (i) => i.productId === product._id && i.size === size
+          (i) =>
+            i.productId === product._id &&
+            i.size === size &&
+            i.customization?.enabled === customization?.enabled &&
+            i.customization?.playerName === customization?.playerName &&
+            i.customization?.number === customization?.number,
         );
 
         if (existing) {
           set({
             items: items.map((i) =>
-              i.productId === product._id && i.size === size
+              i.productId === product._id &&
+              i.size === size &&
+              i.customization?.playerName === customization?.playerName &&
+              i.customization?.number === customization?.number
                 ? { ...i, quantity: i.quantity + quantity }
-                : i
+                : i,
             ),
           });
         } else {
@@ -47,9 +64,10 @@ export const useCart = create<CartState>()(
                 season: product.season,
                 type: product.type,
                 size,
-                price: product.price,
+                price: product.price + (customization?.enabled ? 10000 : 0),
                 quantity,
-                image: product.images[0] || '',
+                image: product.images[0] || "",
+                customization,
               },
             ],
           });
@@ -59,7 +77,7 @@ export const useCart = create<CartState>()(
       removeItem: (productId, size) =>
         set({
           items: get().items.filter(
-            (i) => !(i.productId === productId && i.size === size)
+            (i) => !(i.productId === productId && i.size === size),
           ),
         }),
 
@@ -72,7 +90,7 @@ export const useCart = create<CartState>()(
           items: get().items.map((i) =>
             i.productId === productId && i.size === size
               ? { ...i, quantity }
-              : i
+              : i,
           ),
         });
       },
@@ -89,8 +107,8 @@ export const useCart = create<CartState>()(
         get().items.reduce((sum, item) => sum + item.price * item.quantity, 0),
     }),
     {
-      name: 'retro-shop-cart',
+      name: "retro-shop-cart",
       partialize: (state) => ({ items: state.items }),
-    }
-  )
+    },
+  ),
 );
