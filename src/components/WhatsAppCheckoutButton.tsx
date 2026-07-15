@@ -11,7 +11,7 @@ function buildWhatsAppMessage(
   items: ReturnType<typeof useCart.getState>["items"],
   total: number,
 ): string {
-  const header = `🛒 *Nuevo pedido — ${STORE_NAME}*\n\n`;
+  const header = ` *Nuevo pedido — ${STORE_NAME}*\n\n`;
 
   const lines = items
     .map((item, idx) => {
@@ -44,7 +44,7 @@ function buildWhatsAppMessage(
     `\n\n━━━━━━━━━━━━━━\n` +
     `*TOTAL: ${formatPrice(total)}*\n` +
     `━━━━━━━━━━━━━━\n\n` +
-    `Hola, quiero confirmar este pedido. ¿Me ayudas con el envío? 🙌`;
+    `Hola, quiero confirmar este pedido. ¿Me ayudas con el envío?`;
 
   return header + lines + footer;
 }
