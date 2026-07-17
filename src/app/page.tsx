@@ -1,7 +1,7 @@
-import { Suspense } from 'react';
-import { getAllProducts, getCategories } from '@/lib/queries';
-import { ProductGrid } from '@/components/ProductGrid';
-import { CategoryFilter } from '@/components/CategoryFilter';
+import { Suspense } from "react";
+import { getAllProducts, getCategories } from "@/lib/queries";
+import { ProductGrid } from "@/components/ProductGrid";
+import { CategoryFilter } from "@/components/CategoryFilter";
 
 // Revalida cada 60s para que los cambios en Sanity aparezcan pronto
 export const revalidate = 60;
@@ -11,6 +11,9 @@ export default async function HomePage() {
     getAllProducts(),
     getCategories(),
   ]);
+
+  console.log("PRODUCTOS", products);
+  console.log("CATEGORIAS", categories);
 
   return (
     <>
@@ -27,12 +30,13 @@ export default async function HomePage() {
               · EL FÚTBOL NUNCA PASA DE MODA ·
             </div>
             <h1 className="heading-display text-5xl sm:text-7xl lg:text-8xl mb-6">
-              CAMISETAS QUE<br />
+              CAMISETAS QUE
+              <br />
               <span className="text-accent">CUENTAN</span> HISTORIAS
             </h1>
             <p className="text-lg text-ink/70 max-w-xl leading-relaxed">
-              Retro, versión jugador y versión fan. Calidad premium, envíos a toda Colombia
-              y atención directa por WhatsApp.
+              Retro, versión jugador y versión fan. Calidad premium, envíos a
+              toda Colombia y atención directa por WhatsApp.
             </p>
           </div>
         </div>

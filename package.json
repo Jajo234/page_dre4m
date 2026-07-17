@@ -11,9 +11,12 @@
     "sanity:deploy": "sanity deploy"
   },
   "dependencies": {
-    "@sanity/client": "^6.22.0",
+    "@sanity/client": "^6.29.1",
     "@sanity/image-url": "^1.1.0",
+    "@supabase/supabase-js": "^2.110.7",
+    "axios": "^1.18.1",
     "clsx": "^2.1.1",
+    "fs-extra": "^11.3.6",
     "lucide-react": "^0.460.0",
     "next": "^15.5.15",
     "next-sanity": "^9.12.3",

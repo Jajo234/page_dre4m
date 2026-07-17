@@ -1,46 +1,99 @@
-import { sanityClient, urlFor } from './sanity';
-import type { Product } from '@/types';
+import { supabase } from "./supabase";
+import { Product } from "@/types";
 
-const productProjection = `{
-  "_id": _id,
-  "slug": slug.current,
-  name,
-  team,
-  season,
-  type,
-  "category": category->slug.current,
-  "categoryName": category->name,
-  price,
-  description,
-  "images": images[].asset->url,
-  sizes,
-  stock,
-  featured
-}`;
+function mapProduct(item: any): Product {
+  console.log(item);
+
+  return {
+    _id: item.id,
+    slug: item.slug,
+    name: item.name,
+    team: item.team,
+    season: item.season,
+    type: item.type,
+
+    category: item.categories?.slug ?? "",
+    categoryName: item.categories?.name ?? "",
+
+    price: item.price,
+    description: item.description,
+    stock: item.stock,
+    featured: item.featured,
+
+    images: item.product_images.map((i: any) => i.image_url),
+    sizes: item.product_sizes.map((s: any) => s.size),
+  };
+}
 
 export async function getAllProducts(): Promise<Product[]> {
-  return sanityClient.fetch(
-    `*[_type == "product"] | order(_createdAt desc) ${productProjection}`
-  );
+  const { data, error } = await supabase.from("products").select(`
+      *,
+      categories!products_category_id_fkey(
+        id,
+        name,
+        slug
+      ),
+      product_images(image_url),
+      product_sizes(size)
+    `);
+
+  console.log(JSON.stringify(data, null, 2));
+
+  if (error) {
+    console.log(error);
+    throw error;
+  }
+
+  return data.map(mapProduct);
 }
 
-export async function getProductBySlug(slug: string): Promise<Product | null> {
-  return sanityClient.fetch(
-    `*[_type == "product" && slug.current == $slug][0] ${productProjection}`,
-    { slug }
-  );
+export async function getProductBySlug(slug: string) {
+  const { data, error } = await supabase
+    .from("products")
+    .select(
+      `
+            *,
+            categories(name,slug),
+            product_images(image_url),
+            product_sizes(size)
+        `,
+    )
+    .eq("slug", slug)
+    .single();
+
+  if (error) return null;
+
+  return mapProduct(data);
 }
 
-export async function getFeaturedProducts(): Promise<Product[]> {
-  return sanityClient.fetch(
-    `*[_type == "product" && featured == true] | order(_createdAt desc) ${productProjection}`
-  );
+export async function getFeaturedProducts() {
+  const { data, error } = await supabase
+    .from("products")
+    .select(
+      `
+            *,
+            categories(name,slug),
+            product_images(image_url),
+            product_sizes(size)
+        `,
+    )
+    .eq("featured", true);
+
+  if (error) throw error;
+
+  return data.map(mapProduct);
 }
 
-export async function getCategories(): Promise<{ name: string; slug: string }[]> {
-  return sanityClient.fetch(
-    `*[_type == "category"] | order(order asc) { name, "slug": slug.current }`
-  );
-}
+export async function getCategories() {
+  const { data, error } = await supabase
+    .from("categories")
+    .select("*")
+    .order("sort_order");
 
-export { urlFor };
+  console.log("CATEGORIES:", data);
+  console.log("ERROR CATEGORIES:", error);
+
+  if (error) throw error;
+
+  return data;
+}
