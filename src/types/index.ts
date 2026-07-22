@@ -19,8 +19,8 @@ export interface Product {
   price: number;
   description?: string;
   images: string[];
-  sizes: Size[];
-  stock: boolean;
+  sizes: ProductSize[];
+  availability: "IN_STOCK" | "PREORDER";
   featured?: boolean;
 }
 export interface CartItem {
@@ -39,4 +39,9 @@ export interface CartItem {
     playerName?: string;
     number?: string;
   };
+}
+
+export interface ProductSize {
+  size: "S" | "M" | "L" | "XL" | "XXL";
+  stock: number;
 }

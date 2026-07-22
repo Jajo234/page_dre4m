@@ -17,11 +17,14 @@ function mapProduct(item: any): Product {
 
     price: item.price,
     description: item.description,
-    stock: item.stock,
+    availability: item.availability,
     featured: item.featured,
 
     images: item.product_images.map((i: any) => i.image_url),
-    sizes: item.product_sizes.map((s: any) => s.size),
+    sizes: item.product_sizes.map((s: any) => ({
+      size: s.size,
+      stock: s.stock,
+    })),
   };
 }
 
@@ -34,7 +37,10 @@ export async function getAllProducts(): Promise<Product[]> {
         slug
       ),
       product_images(image_url),
-      product_sizes(size)
+      product_sizes(
+        size,
+        stock
+)
     `);
 
   console.log(JSON.stringify(data, null, 2));
@@ -55,7 +61,10 @@ export async function getProductBySlug(slug: string) {
             *,
             categories(name,slug),
             product_images(image_url),
-            product_sizes(size)
+            product_sizes(
+                size,
+                stock
+            )
         `,
     )
     .eq("slug", slug)
@@ -74,7 +83,10 @@ export async function getFeaturedProducts() {
             *,
             categories(name,slug),
             product_images(image_url),
-            product_sizes(size)
+            product_sizes(
+              size,
+              stock
+            )
         `,
     )
     .eq("featured", true);

@@ -21,6 +21,10 @@ export function ProductDetail({ product }: { product: Product }) {
   const [number, setNumber] = useState("");
   const CUSTOMIZATION_PRICE = 10000;
 
+  const selectedSizeInfo = product.sizes.find((s) => s.size === selectedSize);
+
+  const hasImmediateStock = (selectedSizeInfo?.stock ?? 0) > 0;
+
   const typeLabel =
     product.type === "retro"
       ? "Retro"
@@ -31,7 +35,7 @@ export function ProductDetail({ product }: { product: Product }) {
   const finalPrice = product.price + (customize ? CUSTOMIZATION_PRICE : 0);
 
   const handleAdd = () => {
-    if (!selectedSize || !product.stock) return;
+    if (!selectedSize) return;
 
     const cleanName = playerName.trim().toUpperCase();
     const cleanNumber = number.trim();
@@ -163,26 +167,72 @@ export function ProductDetail({ product }: { product: Product }) {
             </div>
             <div className="flex flex-wrap gap-2">
               {(["S", "M", "L", "XL", "XXL"] as Size[]).map((size) => {
-                const available = product.sizes.includes(size);
+                const sizeInfo = product.sizes.find((s) => s.size === size);
+
+                const exists = !!sizeInfo;
+                const inStock = (sizeInfo?.stock ?? 0) > 0;
                 const selected = selectedSize === size;
+
+                const borderClass = !exists
+                  ? "border-ink/10 text-ink/20 cursor-not-allowed"
+                  : selected
+                    ? inStock
+                      ? "border-green-600 bg-green-600 text-white"
+                      : "border-yellow-500 bg-yellow-500 text-black"
+                    : inStock
+                      ? "border-ink/30 hover:border-green-600 hover:bg-green-50"
+                      : "border-ink/30 hover:border-yellow-500 hover:bg-yellow-50";
                 return (
                   <button
                     key={size}
-                    disabled={!available}
+                    disabled={!exists}
                     onClick={() => setSelectedSize(size)}
-                    className={`w-14 h-14 border-2 font-mono font-semibold transition-colors ${
-                      !available
-                        ? "border-ink/10 text-ink/20 line-through cursor-not-allowed"
-                        : selected
-                          ? "border-ink bg-ink text-cream"
-                          : "border-ink/30 hover:border-ink"
-                    }`}
+                    className={`w-14 h-14 border-2 font-mono font-semibold transition-all duration-200 ${borderClass}`}
                   >
                     {size}
                   </button>
                 );
               })}
             </div>
+          </div>
+
+          <div className="mb-8 border-2 border-ink/10 rounded-lg p-5">
+            <div className="font-mono text-xs tracking-[0.3em] text-ink/60 mb-3">
+              DISPONIBILIDAD
+            </div>
+
+            {!selectedSize ? (
+              <p className="text-sm text-ink/60">
+                Selecciona una talla para conocer el tiempo de entrega.
+              </p>
+            ) : hasImmediateStock ? (
+              <>
+                <p className="font-semibold text-green-700">
+                  🟢 Entrega inmediata
+                </p>
+
+                <p className="text-sm text-ink/60 mt-2">
+                  Tenemos esta talla disponible. Tu pedido será despachado entre
+                  2 y 4 días hábiles.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="font-semibold text-yellow-700">
+                  🟡 Disponible por encargo
+                </p>
+
+                <p className="text-sm text-ink/60 mt-2">
+                  Esta talla se encuentra disponible por pedido. La incluiremos
+                  en nuestro próximo embarque.
+                </p>
+
+                <p className="text-sm font-medium mt-2">
+                  Tiempo estimado:
+                  <span className="text-accent"> 15 a 20 días hábiles.</span>
+                </p>
+              </>
+            )}
           </div>
 
           {/* Personalización */}
@@ -267,11 +317,11 @@ export function ProductDetail({ product }: { product: Product }) {
           {/* Botón agregar */}
           <button
             onClick={handleAdd}
-            disabled={!selectedSize || !product.stock}
+            disabled={!selectedSize}
             className={`w-full py-5 font-mono tracking-[0.2em] text-sm font-semibold transition-colors border-2 ${
               justAdded
                 ? "bg-grass border-grass text-cream"
-                : !selectedSize || !product.stock
+                : !selectedSize
                   ? "bg-ink/10 border-ink/10 text-ink/30 cursor-not-allowed"
                   : "bg-ink border-ink text-cream hover:bg-accent hover:border-accent"
             }`}
@@ -280,8 +330,6 @@ export function ProductDetail({ product }: { product: Product }) {
               <span className="inline-flex items-center gap-2">
                 <Check className="w-4 h-4" /> AGREGADO AL CARRITO
               </span>
-            ) : !product.stock ? (
-              "AGOTADO"
             ) : !selectedSize ? (
               "ELIGE UNA TALLA"
             ) : (

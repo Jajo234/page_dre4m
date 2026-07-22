@@ -21,13 +21,6 @@ export function ProductCard({ product }: { product: Product }) {
         {typeLabel}
       </div>
 
-      {/* Fuera de stock */}
-      {!product.stock && (
-        <div className="absolute top-3 right-3 z-10 bg-ink/90 text-cream text-[10px] font-mono tracking-widest px-2 py-1">
-          AGOTADO
-        </div>
-      )}
-
       {/* Imagen */}
       <div className="aspect-square overflow-hidden bg-cream border-b-2 border-ink">
         {product.images[0] ? (
