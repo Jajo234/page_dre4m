@@ -1,13 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Check } from "lucide-react";
-import type { Product, Size } from "@/types";
+import type { Product, ProductVariant, Size } from "@/types";
 import { useCart } from "@/store/cart";
 import { formatPrice } from "@/lib/utils";
+import { ArrowLeft, Check, CheckCircle2 } from "lucide-react";
 
-export function ProductDetail({ product }: { product: Product }) {
+interface ProductDetailProps {
+  product: Product;
+  variants: ProductVariant[];
+}
+
+export function ProductDetail({ product, variants }: ProductDetailProps) {
   const router = useRouter();
   const addItem = useCart((s) => s.addItem);
   const openCart = useCart((s) => s.openCart);
@@ -25,14 +31,11 @@ export function ProductDetail({ product }: { product: Product }) {
 
   const hasImmediateStock = (selectedSizeInfo?.stock ?? 0) > 0;
 
-  const typeLabel =
-    product.type === "retro"
-      ? "Retro"
-      : product.type === "jugador"
-        ? "Versión Jugador"
-        : "Versión Fan";
-
   const finalPrice = product.price + (customize ? CUSTOMIZATION_PRICE : 0);
+
+  const selectableVariants = variants.filter(
+    (variant) => variant.type !== "retro",
+  );
 
   const handleAdd = () => {
     if (!selectedSize) return;
@@ -133,7 +136,7 @@ export function ProductDetail({ product }: { product: Product }) {
         {/* Info y selector */}
         <div>
           <div className="font-mono text-xs tracking-[0.3em] text-accent mb-3">
-            {typeLabel.toUpperCase()} · {product.season}
+            {product.season}
           </div>
 
           <h1 className="heading-display text-4xl sm:text-5xl mb-2 leading-none">
@@ -147,18 +150,125 @@ export function ProductDetail({ product }: { product: Product }) {
               {formatPrice(finalPrice)}
             </div>
 
+            {selectableVariants.length > 1 && (
+              <div className="mb-8">
+                {product.description && (
+                  <p className="text-ink/80 leading-relaxed mb-8">
+                    {product.description}
+                  </p>
+                )}
+                <div className="font-mono text-xs tracking-[0.3em] text-ink/60 mb-3">
+                  VERSIÓN
+                </div>
+
+                <p className="text-sm text-ink/60 mb-5">
+                  Escoge la versión que mejor se adapte a ti.
+                </p>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  {selectableVariants.map((variant) => {
+                    const active = variant.slug === product.slug;
+
+                    const label =
+                      variant.type === "fan"
+                        ? "FAN"
+                        : variant.type === "jugador"
+                          ? "JUGADOR"
+                          : variant.type.toUpperCase();
+
+                    return (
+                      <Link
+                        key={variant.id}
+                        href={`/producto/${variant.slug}`}
+                        className={`
+                          relative
+                          flex
+                          flex-col
+                          border-2
+                          rounded-xl
+                          p-5
+                          transition-all
+                          duration-300
+                          hover:-translate-y-1
+                          hover:shadow-lg
+                          ${
+                            active
+                              ? "border-accent bg-accent/10 shadow-md"
+                              : "border-ink/10 hover:border-accent hover:shadow-md"
+                          }
+                        `}
+                      >
+                        {active && (
+                          <CheckCircle2 className="absolute top-4 right-4 w-5 h-5 text-accent" />
+                        )}
+                        <div className="text-left">
+                          <h3 className="heading-display text-2xl">{label}</h3>
+
+                          <p className="text-sm text-ink/60 mt-1">
+                            {variant.type === "fan"
+                              ? "Perfecta para el día a día."
+                              : "La versión utilizada en competición."}
+                          </p>
+
+                          <ul className="mt-4 space-y-2 text-sm">
+                            {variant.type === "fan" ? (
+                              <>
+                                <li className="flex items-center gap-2 text-ink/70">
+                                  <span className="text-accent">✓</span>
+                                  Corte clásico
+                                </li>
+
+                                <li className="flex items-center gap-2 text-ink/70">
+                                  <span className="text-accent">✓</span>
+                                  Escudo bordado
+                                </li>
+
+                                <li className="flex items-center gap-2 text-ink/70">
+                                  <span className="text-accent">✓</span>
+                                  Excelente para uso diario
+                                </li>
+                              </>
+                            ) : (
+                              <>
+                                <li className="flex items-center gap-2 text-ink/70">
+                                  <span className="text-accent">✓</span>
+                                  Tela profesional
+                                </li>
+
+                                <li className="flex items-center gap-2 text-ink/70">
+                                  <span className="text-accent">✓</span>
+                                  Ajuste atlético
+                                </li>
+                                <li className="flex items-center gap-2 text-ink/70">
+                                  <span className="text-accent">✓</span>
+                                  Tecnología de alto rendimiento
+                                </li>
+                              </>
+                            )}
+                          </ul>
+                        </div>
+                        <div className="mt-auto pt-6 border-t border-ink/10">
+                          <div className="text-xs font-mono tracking-widest text-ink/40 mb-1">
+                            DESDE
+                          </div>
+
+                          <div className="heading-display text-3xl">
+                            {formatPrice(variant.price)}
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {customize && (
               <p className="mt-2 text-sm text-grass font-medium">
                 Incluye personalización (+{formatPrice(CUSTOMIZATION_PRICE)})
               </p>
             )}
           </div>
-
-          {product.description && (
-            <p className="text-ink/80 leading-relaxed mb-8">
-              {product.description}
-            </p>
-          )}
 
           {/* Selector de talla */}
           <div className="mb-8">

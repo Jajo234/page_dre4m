@@ -3,23 +3,12 @@ import type { Product } from '@/types';
 import { formatPrice } from '@/lib/utils';
 
 export function ProductCard({ product }: { product: Product }) {
-  const typeLabel =
-    product.type === 'retro' ? 'RETRO' :
-    product.type === 'jugador' ? 'JUGADOR' : 'FAN';
-
-  const typeColor =
-    product.type === 'retro' ? 'bg-accent' :
-    product.type === 'jugador' ? 'bg-grass' : 'bg-ink';
 
   return (
     <Link
       href={`/producto/${product.slug}`}
       className="group block relative bg-paper border-2 border-ink hover:-translate-y-1 transition-transform duration-300"
     >
-      {/* Badge del tipo */}
-      <div className={`absolute top-3 left-3 z-10 ${typeColor} text-cream text-[10px] font-mono tracking-widest px-2 py-1`}>
-        {typeLabel}
-      </div>
 
       {/* Imagen */}
       <div className="aspect-square overflow-hidden bg-cream border-b-2 border-ink">

@@ -4,6 +4,7 @@ export type Size = "S" | "M" | "L" | "XL" | "XXL";
 
 export interface Product {
   _id: string;
+  modelId: string;
   slug: string;
   name: string;
   team: string;
@@ -44,4 +45,11 @@ export interface CartItem {
 export interface ProductSize {
   size: "S" | "M" | "L" | "XL" | "XXL";
   stock: number;
+}
+
+export interface ProductVariant {
+  id: string;
+  slug: string;
+  type: string;
+  price: number;
 }
